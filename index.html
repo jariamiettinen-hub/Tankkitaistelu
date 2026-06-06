@@ -1,19 +1,4 @@
-<!DOCTYPE html>
-<html lang="fi">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tankkitaistelu</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-  <style>*{box-sizing:border-box;margin:0;padding:0}body{background:#1a2e1a}</style>
-</head>
-<body>
-  <div id="root"></div>
-  <script>
-var React=window.React,ReactDOM=window.ReactDOM;
-var useState=React.useState,useEffect=React.useEffect,useCallback=React.useCallback,useRef=React.useRef;
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+<!DOCTYPE html><html lang="fi"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tankkitaistelu</title><script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#1a2e1a}</style></head><body><div id="root"></div><script>var React=window.React,ReactDOM=window.ReactDOM;var useState=React.useState,useEffect=React.useEffect,useCallback=React.useCallback,useRef=React.useRef;function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
@@ -33,7 +18,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 // ─── Constants ───────────────────────────────────────────────────────────────
 var SIZES = [10, 12, 13, 14];
 var MINE_RATIO = 0.14;
-var SHOT_POWER = 4;
+var SHOT_POWER = 6;
 var PLAYER_DEF = [{
   id: 0,
   name: "Pelaaja 1",
@@ -65,7 +50,7 @@ var TERRAIN = {
     border: "#0f330f",
     emoji: "🌲",
     label: "Metsä",
-    drain: 1.5,
+    drain: 3,
     mineRisk: 40
   },
   field: {
@@ -73,7 +58,7 @@ var TERRAIN = {
     border: "#a89830",
     emoji: "🌾",
     label: "Pelto",
-    drain: 1.0,
+    drain: 2,
     mineRisk: 30
   },
   mountain: {
@@ -81,7 +66,7 @@ var TERRAIN = {
     border: "#4a4030",
     emoji: "⛰️",
     label: "Vuori",
-    drain: 3.0,
+    drain: 4,
     mineRisk: 50
   },
   river: {
@@ -89,7 +74,7 @@ var TERRAIN = {
     border: "#0e5080",
     emoji: "〰️",
     label: "Joki",
-    drain: 0.5,
+    drain: 1,
     mineRisk: 20
   }
 };
@@ -175,26 +160,25 @@ function getStartPos(id, ROWS, COLS) {
   }][id];
 }
 
-// Check if shooting from (r1,c1) to (r2,c2) is blocked by terrain
-// Does NOT check the target cell itself — only cells in between
-// Shot power drains along each cell in the ray; hits if power > 0 at target
+// Shoot from (r1,c1) to (r2,c2): only cardinal/diagonal lines allowed.
+// Drain accumulates through ALL cells on the path INCLUDING the target cell.
+// Shooter's own cell does NOT drain. Returns remaining power (>=0 = hit, -1 = miss).
 function shotPowerAtTarget(terrain, r1, c1, r2, c2) {
-  var dr = r2 - r1,
-    dc = c2 - c1;
-  if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) return 0;
+  var dr = r2 - r1, dc = c2 - c1;
+  if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) return -1;
   var step = Math.max(Math.abs(dr), Math.abs(dc));
-  var dr1 = Math.sign(dr),
-    dc1 = Math.sign(dc);
-  var power = SHOT_POWER;
+  if (step === 0) return SHOT_POWER; // same cell = always hits
+  var dr1 = Math.sign(dr), dc1 = Math.sign(dc);
+  var cumDrain = 0;
   for (var s = 1; s <= step; s++) {
-    var _TERRAIN$terrain$tr$t, _TERRAIN$terrain$tr$t2, _terrain$tr;
     var tr = r1 + dr1 * s;
     var tc = c1 + dc1 * s;
-    var drain = (_TERRAIN$terrain$tr$t = (_TERRAIN$terrain$tr$t2 = TERRAIN[(_terrain$tr = terrain[tr]) === null || _terrain$tr === void 0 ? void 0 : _terrain$tr[tc]]) === null || _TERRAIN$terrain$tr$t2 === void 0 ? void 0 : _TERRAIN$terrain$tr$t2.drain) !== null && _TERRAIN$terrain$tr$t !== void 0 ? _TERRAIN$terrain$tr$t : 1;
-    power -= drain;
-    if (power <= 0) return 0;
+    var ct = terrain[tr] && terrain[tr][tc];
+    if (s < step && TERRAIN[ct] && TERRAIN[ct].blockShot) return -1;
+    cumDrain += (TERRAIN[ct] && TERRAIN[ct].drain) || 1;
+    if (cumDrain > SHOT_POWER) return -1;
   }
-  return power;
+  return SHOT_POWER - cumDrain;
 }
 
 // Returns list of target ids that can be shot from pos by playerId
@@ -203,7 +187,7 @@ function getShootableTargets(game, shooterId) {
   return game.players.filter(function (p) {
     return p.id !== shooterId && p.alive;
   }).filter(function (p) {
-    return shotPowerAtTarget(game.terrain, shooter.pos.r, shooter.pos.c, p.pos.r, p.pos.c) > 0;
+    return shotPowerAtTarget(game.terrain, shooter.pos.r, shooter.pos.c, p.pos.r, p.pos.c) >= 0;
   }).map(function (p) {
     return p.id;
   });
@@ -312,7 +296,8 @@ function advancePhase(g) {
     phase: "move",
     round: round,
     msg: "",
-    lastShot: null
+    lastShot: null,
+    deathReason: null
   });
 }
 function applyMove(g, nr, nc) {
@@ -350,7 +335,6 @@ function applyMove(g, nr, nc) {
     });
     mines[nr][nc] = false;
     if (players[pid].armor > 0) {
-      // Armor absorbs the mine hit
       players[pid] = _objectSpread(_objectSpread({}, players[pid]), {}, {
         armor: players[pid].armor - 1
       });
@@ -361,6 +345,10 @@ function applyMove(g, nr, nc) {
         mines: mines,
         currentTurn: _next,
         phase: "move",
+        armorHit: {
+          id: pid,
+          remaining: players[pid].armor
+        },
         msg: "\uD83D\uDEE1\uFE0F ".concat(PLAYER_DEF[pid].name, " lis\xE4panssari suojasi miinalta! (").concat(players[pid].armor, " j\xE4ljell\xE4)")
       });
     }
@@ -370,6 +358,9 @@ function applyMove(g, nr, nc) {
     var alive = players.filter(function (p) {
       return p.alive;
     });
+    var mt = TERRAIN[g.terrain[nr][nc]];
+    var mtSuffix = (mt === null || mt === void 0 ? void 0 : mt.label) === "Pelto" ? "pellossa" : (mt === null || mt === void 0 ? void 0 : mt.label) === "Metsä" ? "metsässä" : (mt === null || mt === void 0 ? void 0 : mt.label) === "Vuori" ? "vuorella" : (mt === null || mt === void 0 ? void 0 : mt.label) === "Joki" ? "joessa" : (_mt$label = mt === null || mt === void 0 ? void 0 : mt.label) !== null && _mt$label !== void 0 ? _mt$label : "";
+    var mineMsg = "".concat(PLAYER_DEF[pid].name, " ajoi miinaan ").concat((_mt$emoji = mt === null || mt === void 0 ? void 0 : mt.emoji) !== null && _mt$emoji !== void 0 ? _mt$emoji : "", " ").concat(mtSuffix, "!");
     if (alive.length <= 1) {
       var _winner$id;
       var winner = alive[0];
@@ -379,23 +370,8 @@ function applyMove(g, nr, nc) {
         mines: mines,
         gameOver: true,
         winner: (_winner$id = winner === null || winner === void 0 ? void 0 : winner.id) !== null && _winner$id !== void 0 ? _winner$id : null,
-        msg: alive.length === 1 ? "\uD83C\uDFC6 ".concat(PLAYER_DEF[winner.id].name, " voitti!") : "💥 Kaikki tuhoutuivat!"
-      });
-    }
-    var mt = TERRAIN[g.terrain[nr][nc]];
-    var mtSuffix = (mt === null || mt === void 0 ? void 0 : mt.label) === "Pelto" ? "pellossa" : (mt === null || mt === void 0 ? void 0 : mt.label) === "Metsä" ? "metsässä" : (mt === null || mt === void 0 ? void 0 : mt.label) === "Vuori" ? "vuorella" : (mt === null || mt === void 0 ? void 0 : mt.label) === "Joki" ? "joessa" : (_mt$label = mt === null || mt === void 0 ? void 0 : mt.label) !== null && _mt$label !== void 0 ? _mt$label : "";
-    var mineMsg = "".concat(PLAYER_DEF[pid].name, " ajoi miinaan ").concat((_mt$emoji = mt === null || mt === void 0 ? void 0 : mt.emoji) !== null && _mt$emoji !== void 0 ? _mt$emoji : "", " ").concat(mtSuffix, "!");
-    if (alive.length <= 1) {
-      var _winner$id2;
-      var _winner = alive[0];
-      return _objectSpread(_objectSpread({}, g), {}, {
-        players: players,
-        revealed: revealed,
-        mines: mines,
-        gameOver: true,
-        winner: (_winner$id2 = _winner === null || _winner === void 0 ? void 0 : _winner.id) !== null && _winner$id2 !== void 0 ? _winner$id2 : null,
         deathReason: mineMsg,
-        msg: alive.length === 1 ? "\uD83C\uDFC6 ".concat(PLAYER_DEF[_winner.id].name, " voitti!") : "\uD83D\uDCA5 Kaikki tuhoutuivat!"
+        msg: alive.length === 1 ? "\uD83C\uDFC6 ".concat(PLAYER_DEF[winner.id].name, " voitti!") : "\uD83D\uDCA5 Kaikki tuhoutuivat!"
       });
     }
     var next = nextAliveTurn(players, pid);
@@ -409,20 +385,20 @@ function applyMove(g, nr, nc) {
       msg: "\uD83D\uDCA5 ".concat(mineMsg)
     });
   }
-  var newG = _objectSpread(_objectSpread({}, g), {}, {
+  var shootG = _objectSpread(_objectSpread({}, g), {}, {
     players: players,
     revealed: revealed,
     phase: "shoot"
   });
   // Check if anyone in range to shoot
-  var targets = getShootableTargets(newG, pid);
+  var targets = getShootableTargets(shootG, pid);
   var isHuman = g.players[pid].type === "human";
   if (isHuman) {
-    return _objectSpread(_objectSpread({}, newG), {}, {
+    return _objectSpread(_objectSpread({}, shootG), {}, {
       msg: targets.length > 0 ? "Ammu vihollista" : "Ei kohteita kantamalla"
     });
   }
-  return newG; // CPU handles shoot separately
+  return shootG; // CPU handles shoot separately
 }
 function applyShoot(g, targetId) {
   var _targetTerrain$label, _targetTerrain$emoji;
@@ -464,17 +440,17 @@ function applyShoot(g, targetId) {
   });
   var targetTerrain = TERRAIN[g.terrain[target.pos.r][target.pos.c]];
   var terrainName = (_targetTerrain$label = targetTerrain === null || targetTerrain === void 0 ? void 0 : targetTerrain.label) !== null && _targetTerrain$label !== void 0 ? _targetTerrain$label : "";
-  var terrainEmoji = (_targetTerrain$emoji = targetTerrain === null || targetTerrain === void 0 ? void 0 : targetTerrain.emoji) !== null && _targetTerrain$emoji !== void 0 ? _targetTerrain$emoji : "";
+  var terrainEmoji = targetTerrain && targetTerrain.label === "Joki" ? "🌊" : ((_targetTerrain$emoji = targetTerrain === null || targetTerrain === void 0 ? void 0 : targetTerrain.emoji) !== null && _targetTerrain$emoji !== void 0 ? _targetTerrain$emoji : "");
   var terrainSuffix = terrainName === "Pelto" ? "pellossa" : terrainName === "Metsä" ? "metsässä" : terrainName === "Vuori" ? "vuorella" : terrainName === "Joki" ? "joessa" : terrainName;
   var killMsg = "".concat(PLAYER_DEF[pid].name, " ampui ").concat(PLAYER_DEF[targetId].name.toLowerCase(), "n tankin ").concat(terrainEmoji, " ").concat(terrainSuffix, "!");
   if (alive.length <= 1) {
-    var _winner$id3;
+    var _winner$id2;
     var winner = alive[0];
     return _objectSpread(_objectSpread({}, g), {}, {
       players: players,
       lastShot: lastShot,
       gameOver: true,
-      winner: (_winner$id3 = winner === null || winner === void 0 ? void 0 : winner.id) !== null && _winner$id3 !== void 0 ? _winner$id3 : null,
+      winner: (_winner$id2 = winner === null || winner === void 0 ? void 0 : winner.id) !== null && _winner$id2 !== void 0 ? _winner$id2 : null,
       deathReason: killMsg,
       msg: alive.length === 1 ? "\uD83C\uDFC6 ".concat(PLAYER_DEF[winner.id].name, " voitti!") : "\uD83D\uDCA5 Kaikki tuhoutuivat!"
     });
@@ -546,7 +522,7 @@ function cpuTakeTurn(g) {
             }]);
             // Check if we reached shooting range of any enemy
             var nearEnemy = enemies.some(function (e) {
-              return shotPowerAtTarget(g.terrain, nr, nc, e.pos.r, e.pos.c) > 0;
+              return shotPowerAtTarget(g.terrain, nr, nc, e.pos.r, e.pos.c) >= 0;
             });
             if (nearEnemy) {
               firstStep = np[0];
@@ -852,7 +828,7 @@ function SetupScreen(_ref3) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 var NUM_COLORS = ["", "#fff9a0", "#b8ffb8", "#ffb8b8", "#ff7070", "#ff3030", "#ff0000", "#aa0000", "#660000"];
 function App() {
-  var _game$players, _game$players2;
+  var _game$players, _game$players2, _PLAYER_DEF$armorHit$;
   var _useState5 = useState("setup"),
     _useState6 = _slicedToArray(_useState5, 2),
     screen = _useState6[0],
@@ -864,13 +840,46 @@ function App() {
   var _useState9 = useState(null),
     _useState0 = _slicedToArray(_useState9, 2),
     explosion = _useState0[0],
-    setExplosion = _useState0[1]; // array of player ids
+    setExplosion = _useState0[1];
   var _useState1 = useState(null),
     _useState10 = _slicedToArray(_useState1, 2),
-    shotAnim = _useState10[0],
-    setShotAnim = _useState10[1]; // { from, to }
+    armorHit = _useState10[0],
+    setArmorHit = _useState10[1];
+  var eventQueueRef = useRef([]);
+  var processingRef = useRef(false);
+  var _processQueue = function processQueue() {
+    if (eventQueueRef.current.length === 0) {
+      processingRef.current = false;
+      return;
+    }
+    processingRef.current = true;
+    var evt = eventQueueRef.current.shift();
+    if (evt.type === 'explosion') {
+      setExplosion(evt.data);
+      if (navigator.vibrate) navigator.vibrate([100, 50, 200, 50, 400]);
+    } else if (evt.type === 'armor') {
+      setArmorHit(evt.data);
+    }
+    setTimeout(function () {
+      setExplosion(null);
+      setArmorHit(null);
+      setTimeout(_processQueue, 400);
+    }, 5000);
+  };
+  var queueEvent = function queueEvent(type, data) {
+    eventQueueRef.current.push({
+      type: type,
+      data: data
+    });
+    if (!processingRef.current) _processQueue();
+  }; // array of player ids
+  var _useState11 = useState(null),
+    _useState12 = _slicedToArray(_useState11, 2),
+    shotAnim = _useState12[0],
+    setShotAnim = _useState12[1]; // { from, to }
   var gameRef = useRef(null);
   var prevAliveRef = useRef([]);
+  var prevArmorKeyRef = useRef(null);
   useEffect(function () {
     gameRef.current = game;
   }, [game]);
@@ -888,14 +897,22 @@ function App() {
       return p.alive;
     });
     if (exploded.length) {
-      setExplosion({
+      queueEvent('explosion', {
         ids: exploded,
         reason: game.deathReason || game.msg
       });
-      setTimeout(function () {
-        return setExplosion(null);
-      }, 3500);
-      if (navigator.vibrate) navigator.vibrate([100, 50, 200, 50, 400]);
+    }
+    if (game.armorHit) {
+      var _armorKey = game.armorHit.id + ':' + game.armorHit.remaining + ':' + (game.currentTurn);
+      if (_armorKey !== prevArmorKeyRef.current) {
+        prevArmorKeyRef.current = _armorKey;
+        var player = game.players.find(function (p) {
+          return p.id === game.armorHit.id;
+        });
+        if (player && player.alive) {
+          queueEvent('armor', game.armorHit);
+        }
+      }
     }
     if (game.lastShot) {
       setShotAnim(game.lastShot);
@@ -905,7 +922,7 @@ function App() {
     }
   }, [JSON.stringify(game === null || game === void 0 || (_game$players = game.players) === null || _game$players === void 0 ? void 0 : _game$players.map(function (p) {
     return p.alive;
-  })), game === null || game === void 0 ? void 0 : game.lastShot]);
+  })), game === null || game === void 0 ? void 0 : game.lastShot, JSON.stringify(game === null || game === void 0 ? void 0 : game.armorHit)]);
   var startGame = function startGame(size, types) {
     var g = buildGame(size, types);
     prevAliveRef.current = g.players.map(function (p) {
@@ -918,6 +935,7 @@ function App() {
   // CPU auto-move
   useEffect(function () {
     if (!game || game.gameOver || screen !== "game") return;
+    if (explosion || armorHit) return; // wait for event display
     var p = game.players[game.currentTurn];
     if (!p || p.type !== "cpu" || !p.alive) return;
     var id = setTimeout(function () {
@@ -927,17 +945,17 @@ function App() {
         if (!cp || cp.type !== "cpu" || !cp.alive) return prev;
         return cpuTakeTurn(prev);
       });
-    }, 500);
+    }, 2500);
     return function () {
       return clearTimeout(id);
     };
   }, [game === null || game === void 0 ? void 0 : game.currentTurn, game === null || game === void 0 ? void 0 : game.phase, game === null || game === void 0 ? void 0 : game.gameOver, game === null || game === void 0 || (_game$players2 = game.players) === null || _game$players2 === void 0 ? void 0 : _game$players2.map(function (p) {
     return p.alive;
-  }).join(",")]);
-  var _useState11 = useState(0),
-    _useState12 = _slicedToArray(_useState11, 2),
-    visibleRange = _useState12[0],
-    setVisibleRange = _useState12[1];
+  }).join(","), explosion, armorHit]);
+  var _useState13 = useState(0),
+    _useState14 = _slicedToArray(_useState13, 2),
+    visibleRange = _useState14[0],
+    setVisibleRange = _useState14[1];
 
   // Animate range dots appearing in steps when shoot phase starts
   useEffect(function () {
@@ -947,15 +965,15 @@ function App() {
       return;
     }
     setVisibleRange(1);
-    var t2 = setTimeout(function () {
-      return setVisibleRange(2);
-    }, 350);
-    var t3 = setTimeout(function () {
-      return setVisibleRange(3);
-    }, 700);
+    var t2 = setTimeout(function () { return setVisibleRange(2); }, 180);
+    var t3 = setTimeout(function () { return setVisibleRange(4); }, 360);
+    var t4 = setTimeout(function () { return setVisibleRange(6); }, 540);
+    var t5 = setTimeout(function () { return setVisibleRange(99); }, 720);
     return function () {
       clearTimeout(t2);
       clearTimeout(t3);
+      clearTimeout(t4);
+      clearTimeout(t5);
     };
   }, [game === null || game === void 0 ? void 0 : game.phase, game === null || game === void 0 ? void 0 : game.currentTurn]);
   var doMove = useCallback(function (dr, dc) {
@@ -1151,7 +1169,7 @@ function App() {
         color: "#ff6b6b",
         fontWeight: 700
       }
-    }, "\uD83C\uDFAF AMMU"), isActive && !isTarget && phase === "shoot" && /*#__PURE__*/React.createElement("div", {
+    }, "AMMU"), isActive && !isTarget && phase === "shoot" && /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 9,
         color: "#aaa"
@@ -1263,7 +1281,7 @@ function App() {
         if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) return false;
         var step = Math.max(Math.abs(dr), Math.abs(dc));
         if (step > visibleRange) return false;
-        return shotPowerAtTarget(terrain, curP.pos.r, curP.pos.c, r, c) > 0;
+        return shotPowerAtTarget(terrain, curP.pos.r, curP.pos.c, r, c) >= 0;
       }();
       var bg = tRev.bg,
         border = tRev.border;
@@ -1298,7 +1316,7 @@ function App() {
             fontSize: fs * 0.8,
             lineHeight: t === "river" ? "1.1" : "1"
           }
-        }, t === "river" ? "〰" : tInfo.emoji), t === "river" && /*#__PURE__*/React.createElement("span", {
+        }, tInfo.emoji), t === "river" && /*#__PURE__*/React.createElement("span", {
           style: {
             fontSize: fs * 0.8,
             lineHeight: "1.1"
@@ -1307,11 +1325,25 @@ function App() {
           color: pd.tankColor,
           border: pd.border,
           size: cellSize * 0.82
-        }) : /*#__PURE__*/React.createElement("span", {
+        }) : /*#__PURE__*/React.createElement("div", {
           style: {
-            fontSize: fs * 0.7
+            display: "grid",
+            gridTemplateColumns: here.length <= 2 ? "1fr 1fr" : here.length <= 4 ? "1fr 1fr" : "1fr 1fr 1fr",
+            gap: 1,
+            width: "100%",
+            height: "100%",
+            alignItems: "center",
+            justifyItems: "center",
+            padding: 1
           }
-        }, "\u2694\uFE0F"), minesNearby > 0 && /*#__PURE__*/React.createElement("div", {
+        }, here.map(function (hp) {
+          return /*#__PURE__*/React.createElement(Tank, {
+            key: hp.id,
+            color: PLAYER_DEF[hp.id].tankColor,
+            border: PLAYER_DEF[hp.id].border,
+            size: cellSize * 0.44
+          });
+        })), minesNearby > 0 && /*#__PURE__*/React.createElement("div", {
           style: {
             position: "absolute",
             top: -3,
@@ -1362,7 +1394,7 @@ function App() {
             fontSize: fs * (isRev && n > 0 ? 0.5 : 0.8),
             lineHeight: t === "river" ? "1.1" : "1"
           }
-        }, t === "river" ? "〰" : tInfo.emoji), t === "river" && /*#__PURE__*/React.createElement("span", {
+        }, tInfo.emoji), t === "river" && /*#__PURE__*/React.createElement("span", {
           style: {
             fontSize: fs * (isRev && n > 0 ? 0.5 : 0.8),
             lineHeight: "1.1"
@@ -1616,11 +1648,11 @@ function App() {
       alignItems: "center",
       justifyContent: "center",
       background: "radial-gradient(circle at 50% 60%, #ff9500 0%, #ff3300 35%, #aa0000 65%, #1a0000 100%)",
-      animation: "explodeFade 3.5s ease-out forwards",
+      animation: "explodeFade 5s ease-out forwards",
       pointerEvents: "none",
       overflow: "hidden"
     }
-  }, /*#__PURE__*/React.createElement("style", null, "\n            @keyframes explodeFade{0%{opacity:0;transform:scale(0.4)}8%{opacity:1;transform:scale(1.08)}80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}\n            @keyframes popIn{0%{transform:scale(0) rotate(-10deg);opacity:0}50%{transform:scale(1.4) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0deg);opacity:1}}\n            @keyframes shake{0%,100%{transform:translateX(0) rotate(0)}15%{transform:translateX(-18px) rotate(-4deg)}30%{transform:translateX(18px) rotate(4deg)}45%{transform:translateX(-12px) rotate(-2deg)}60%{transform:translateX(12px) rotate(2deg)}75%{transform:translateX(-6px)}}\n            @keyframes flame1{0%,100%{transform:scaleY(1) scaleX(1) translateY(0);opacity:1}33%{transform:scaleY(1.3) scaleX(0.85) translateY(-8px);opacity:0.9}66%{transform:scaleY(0.85) scaleX(1.15) translateY(4px);opacity:1}}\n            @keyframes flame2{0%,100%{transform:scaleY(1) scaleX(1) rotate(-3deg);opacity:0.85}50%{transform:scaleY(1.4) scaleX(0.8) rotate(5deg);opacity:1}}\n            @keyframes flame3{0%,100%{transform:scaleY(0.9) rotate(4deg);opacity:0.8}40%{transform:scaleY(1.35) rotate(-6deg);opacity:1}}\n            @keyframes spark{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--sx),var(--sy)) scale(0);opacity:0}}\n            @keyframes smokeRise{0%{transform:translateY(0) scale(0.5);opacity:0.7}100%{transform:translateY(-120px) scale(2.5);opacity:0}}\n          "), _toConsumableArray(Array(5)).map(function (_, i) {
+  }, /*#__PURE__*/React.createElement("style", null, "\n            @keyframes explodeFade{0%{opacity:0;transform:scale(0.4)}8%{opacity:1;transform:scale(1.08)}85%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}\n            @keyframes popIn{0%{transform:scale(0) rotate(-10deg);opacity:0}50%{transform:scale(1.4) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0deg);opacity:1}}\n            @keyframes shake{0%,100%{transform:translateX(0) rotate(0)}15%{transform:translateX(-18px) rotate(-4deg)}30%{transform:translateX(18px) rotate(4deg)}45%{transform:translateX(-12px) rotate(-2deg)}60%{transform:translateX(12px) rotate(2deg)}75%{transform:translateX(-6px)}}\n            @keyframes flame1{0%,100%{transform:scaleY(1) scaleX(1) translateY(0);opacity:1}33%{transform:scaleY(1.3) scaleX(0.85) translateY(-8px);opacity:0.9}66%{transform:scaleY(0.85) scaleX(1.15) translateY(4px);opacity:1}}\n            @keyframes flame2{0%,100%{transform:scaleY(1) scaleX(1) rotate(-3deg);opacity:0.85}50%{transform:scaleY(1.4) scaleX(0.8) rotate(5deg);opacity:1}}\n            @keyframes flame3{0%,100%{transform:scaleY(0.9) rotate(4deg);opacity:0.8}40%{transform:scaleY(1.35) rotate(-6deg);opacity:1}}\n            @keyframes spark{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--sx),var(--sy)) scale(0);opacity:0}}\n            @keyframes smokeRise{0%{transform:translateY(0) scale(0.5);opacity:0.7}100%{transform:translateY(-120px) scale(2.5);opacity:0}}\n          "), _toConsumableArray(Array(5)).map(function (_, i) {
     return /*#__PURE__*/React.createElement("div", {
       key: "smoke".concat(i),
       style: {
@@ -1781,32 +1813,50 @@ function App() {
     }
   }, "\uD83D\uDCA5"), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 30,
-      fontWeight: 900,
-      color: "#fff",
-      textShadow: "0 0 30px #ff4400, 0 0 60px #ff0000",
       animation: "shake 0.5s ease-out 0.1s",
       textAlign: "center",
       padding: "0 20px",
       zIndex: 2
     }
-  }, explosion.ids.map(function (id) {
-    return PLAYER_DEF[id].name;
-  }).join(" & "), " TUHOUTUI!"), explosion.reason && /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 17,
-      color: "#ffddaa",
-      marginTop: 10,
-      textAlign: "center",
-      padding: "0 24px",
-      fontWeight: 600,
-      textShadow: "0 0 10px #aa4400",
-      zIndex: 2,
-      lineHeight: 1.4
-    }
-  }, explosion.reason)));
+  }, explosion.ids.map(function (id, i) {
+    var pd = PLAYER_DEF[id];
+    return /*#__PURE__*/React.createElement("div", {
+      key: id,
+      style: {
+        fontSize: 36,
+        fontWeight: 900,
+        color: "#ffffff",
+        textShadow: "0 0 15px ".concat(pd.tankColor, ", 0 0 30px ").concat(pd.tankColor, ", 0 0 60px #ff0000, 2px 2px 4px rgba(0,0,0,0.8)"),
+        WebkitTextStroke: "1px ".concat(pd.tankColor)
+      }
+    }, i > 0 && /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "#fff",
+        fontSize: 24
+      }
+    }, "& "), pd.name, " TUHOUTUI!");
+  })), explosion.reason && function () {
+    var r = explosion.reason;
+    var shootMatch = r.match(/^(Pelaaja \d+) ampui (pelaaja \d+)/i);
+    var mineMatch = r.match(/^(Pelaaja \d+) ajoi miinaan (.+)/i);
+    var line = r;
+    if (shootMatch) {
+      var victimNum = shootMatch[2].replace(/pelaaja /i, '');
+      line = "".concat(shootMatch[1], " tuhosi pelaajan ").concat(victimNum);
+    } else if (mineMatch) line = "".concat(mineMatch[1], " ajoi miinaan ").concat(mineMatch[2]);
+    return /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 19,
+        color: "#ffddaa",
+        marginTop: 14,
+        textAlign: "center",
+        padding: "0 24px",
+        fontWeight: 600,
+        textShadow: "0 0 10px #aa4400",
+        zIndex: 2,
+        lineHeight: 1.5
+      }
+    }, line);
+  }()));
 }
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-  </script>
-</body>
-</html>
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));</script></body></html>
