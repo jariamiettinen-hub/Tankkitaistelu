@@ -347,8 +347,11 @@ function applyMove(g, nr, nc) {
         phase: "move",
         armorHit: {
           id: pid,
-          remaining: players[pid].armor
+          remaining: players[pid].armor,
+          noShoot: true,
+          seq: (g.armorHitSeq || 0) + 1
         },
+        armorHitSeq: (g.armorHitSeq || 0) + 1,
         msg: "\uD83D\uDEE1\uFE0F ".concat(PLAYER_DEF[pid].name, " lis\xE4panssari suojasi miinalta! (").concat(players[pid].armor, " j\xE4ljell\xE4)")
       });
     }
@@ -827,6 +830,41 @@ function SetupScreen(_ref3) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 var NUM_COLORS = ["", "#fff9a0", "#b8ffb8", "#ffb8b8", "#ff7070", "#ff3030", "#ff0000", "#aa0000", "#660000"];
+function NoShootPopup(_ref) {
+  var armorHit = _ref.armorHit;
+  if (!armorHit || !armorHit.noShoot) return null;
+  var pd = PLAYER_DEF[armorHit.id];
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "fixed",
+      inset: 0,
+      zIndex: 9998,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "radial-gradient(circle, #1a3a6a 0%, #0a1a3a 60%, #000820 100%)",
+      animation: "armorFade2 3s ease-out forwards",
+      pointerEvents: "none"
+    }
+  }, /*#__PURE__*/React.createElement("style", null, "@keyframes armorFade2{0%{opacity:0;transform:scale(0.8)}10%{opacity:1;transform:scale(1.02)}80%{opacity:1}100%{opacity:0}}\n      @keyframes shieldPulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 100,
+      animation: "shieldPulse2 0.4s ease-in-out 3",
+      filter: "drop-shadow(0 0 40px #4488ff) drop-shadow(0 0 80px #2244cc)"
+    }
+  }, "\uD83D\uDEE1\uFE0F"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 26,
+      fontWeight: 900,
+      color: "#88ccff",
+      textShadow: "0 0 20px #4488ff",
+      marginTop: 16,
+      textAlign: "center",
+      padding: "0 20px"
+    }
+  }, pd ? pd.name : "", " ei pysty en\u00E4\u00E4 ampumaan ajettuaan miinaan"));
+}
 function App() {
   var _game$players, _game$players2, _PLAYER_DEF$armorHit$;
   var _useState5 = useState("setup"),
@@ -860,11 +898,12 @@ function App() {
     } else if (evt.type === 'armor') {
       setArmorHit(evt.data);
     }
+    var _dur = evt.type === 'armor' && evt.data && evt.data.noShoot ? 3000 : 5000;
     setTimeout(function () {
       setExplosion(null);
       setArmorHit(null);
       setTimeout(_processQueue, 400);
-    }, 5000);
+    }, _dur);
   };
   var queueEvent = function queueEvent(type, data) {
     eventQueueRef.current.push({
@@ -903,7 +942,7 @@ function App() {
       });
     }
     if (game.armorHit) {
-      var _armorKey = game.armorHit.id + ':' + game.armorHit.remaining + ':' + (game.currentTurn);
+      var _armorKey = 'seq:' + game.armorHit.seq;
       if (_armorKey !== prevArmorKeyRef.current) {
         prevArmorKeyRef.current = _armorKey;
         var player = game.players.find(function (p) {
@@ -977,6 +1016,7 @@ function App() {
     };
   }, [game === null || game === void 0 ? void 0 : game.phase, game === null || game === void 0 ? void 0 : game.currentTurn]);
   var doMove = useCallback(function (dr, dc) {
+    if (armorHit) return;
     setGame(function (g) {
       if (!g || g.gameOver || g.phase !== "move") return g;
       var p = g.players[g.currentTurn];
@@ -988,16 +1028,18 @@ function App() {
       });
       return applyMove(g, nr, nc);
     });
-  }, []);
+  }, [armorHit]);
   var doShoot = useCallback(function (targetId) {
+    if (armorHit) return;
     setGame(function (g) {
       if (!g || g.gameOver || g.phase !== "shoot") return g;
       var p = g.players[g.currentTurn];
       if (!p || p.type !== "human" || !p.alive) return g;
       return applyShoot(g, targetId);
     });
-  }, []);
+  }, [armorHit]);
   var skipShoot = useCallback(function () {
+    if (armorHit) return;
     setGame(function (g) {
       if (!g) return g;
       if (g.gameOver) return g;
@@ -1013,7 +1055,7 @@ function App() {
         lastShot: null
       });
     });
-  }, []);
+  }, [armorHit]);
 
   // Keyboard
   useEffect(function () {
@@ -1060,7 +1102,8 @@ function App() {
   var isMovePhase = phase === "move" && isHumanTurn;
   var isShootPhase = phase === "shoot" && isHumanTurn;
   var shootableTargets = isShootPhase ? getShootableTargets(game, currentTurn) : [];
-  return /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("style", null, "@keyframes pulseSkip{0%{filter:brightness(1);box-shadow:0 0 0 rgba(255,34,34,0)}50%{filter:brightness(1.7);box-shadow:0 0 22px rgba(255,80,80,1)}100%{filter:brightness(1);box-shadow:0 0 0 rgba(255,34,34,0)}}\n      @keyframes moveTargetPulse{0%{box-shadow:inset 0 0 0 2px rgba(255,255,255,0.25), 0 0 0 rgba(255,255,255,0)}100%{box-shadow:inset 0 0 0 2px rgba(255,255,255,1), 0 0 10px rgba(255,255,255,0.9)}}"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontFamily: "sans-serif",
       padding: "10px 6px",
@@ -1139,9 +1182,9 @@ function App() {
         opacity: !p.alive ? 0.35 : 1,
         cursor: isTarget ? "crosshair" : "default",
         transition: "all 0.2s",
-        animation: isTarget ? "pulse 0.6s ease-in-out infinite alternate" : "none"
+        animation: isTarget ? "pulse 1s ease-in-out infinite" : "none"
       }
-    }, /*#__PURE__*/React.createElement("style", null, "@keyframes pulse { from{box-shadow:0 0 0 rgba(231,76,60,0)} to{box-shadow:0 0 12px rgba(231,76,60,0.8)} }"), /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement("style", null, "@keyframes pulse{0%{filter:brightness(1);box-shadow:0 0 0 rgba(231,76,60,0)}50%{filter:brightness(1.7);box-shadow:0 0 18px rgba(255,100,90,1)}100%{filter:brightness(1);box-shadow:0 0 0 rgba(231,76,60,0)}}"), /*#__PURE__*/React.createElement("div", {
       style: {
         position: "relative"
       }
@@ -1220,7 +1263,8 @@ function App() {
       border: "1.5px solid #ff2222",
       color: "#ffffff",
       cursor: "pointer",
-      WebkitTapHighlightColor: "transparent"
+      WebkitTapHighlightColor: "transparent",
+      animation: "pulseSkip 1s ease-in-out infinite"
     }
   }, "Ohita ammunta") : null), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1448,6 +1492,7 @@ function App() {
           cursor: inShotLine ? "crosshair" : isAdjacent && !isRestricted ? "pointer" : isAdjacent ? "not-allowed" : "default",
           outline: isRestricted ? "2px solid rgba(180,50,50,0.8)" : isAdjacent ? "2px solid rgba(255,255,255,0.5)" : inShotLine ? "2px solid rgba(231,76,60,0.8)" : "none",
           outlineOffset: "-2px",
+          animation: isAdjacent && !isRestricted ? "moveTargetPulse 0.8s ease-in-out infinite alternate" : "none",
           zIndex: isAdjacent || inShotLine ? 1 : 0,
           background: isRestricted ? "#3a1a1a" : inShotLine ? "#5a1a1a" : bg
         }
@@ -1533,7 +1578,7 @@ function App() {
         }
       })));
     });
-  }))), gameOver && msg.includes("voitti") ? /*#__PURE__*/React.createElement("div", {
+  }))), gameOver && msg.includes("voitti") && !explosion ? /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: "center",
       marginBottom: 0,
@@ -1560,7 +1605,7 @@ function App() {
       color: msg.includes("räjäh") || msg.includes("tuhosi") || msg.includes("miinaan") ? "#fca5a5" : "#c8e8a0",
       textShadow: "0 1px 3px rgba(0,0,0,0.8)"
     }
-  }, msg), !(gameOver && msg.includes("voitti")) && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, msg), !(gameOver && msg.includes("voitti")) && !explosion && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: "center",
       fontSize: 11,
@@ -1857,6 +1902,8 @@ function App() {
         lineHeight: 1.5
       }
     }, line);
-  }()));
+  }())), /*#__PURE__*/React.createElement(NoShootPopup, {
+    armorHit: armorHit
+  })));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));</script></body></html>
