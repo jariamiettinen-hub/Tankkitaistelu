@@ -410,7 +410,8 @@ function applyShoot(g, targetId) {
   var lastShot = {
     from: _objectSpread({}, g.players[pid].pos),
     to: _objectSpread({}, target.pos),
-    hit: true
+    hit: true,
+    armor: target.armor > 0
   };
   if (target.armor > 0) {
     // Armor absorbs the shot
@@ -832,7 +833,8 @@ function SetupScreen(_ref3) {
 var NUM_COLORS = ["", "#fff9a0", "#b8ffb8", "#ffb8b8", "#ff7070", "#ff3030", "#ff0000", "#aa0000", "#660000"];
 function NoShootPopup(_ref) {
   var armorHit = _ref.armorHit;
-  if (!armorHit || !armorHit.noShoot) return null;
+  var showNoShoot = _ref.showNoShoot;
+  if (!showNoShoot || !armorHit) return null;
   var pd = PLAYER_DEF[armorHit.id];
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -883,6 +885,10 @@ function App() {
     _useState10 = _slicedToArray(_useState1, 2),
     armorHit = _useState10[0],
     setArmorHit = _useState10[1];
+  var _useStateNS = useState(false),
+    _useStateNS2 = _slicedToArray(_useStateNS, 2),
+    showNoShoot = _useStateNS2[0],
+    setShowNoShoot = _useStateNS2[1];
   var eventQueueRef = useRef([]);
   var processingRef = useRef(false);
   var _processQueue = function processQueue() {
@@ -950,6 +956,7 @@ function App() {
         });
         if (player && player.alive) {
           queueEvent('armor', game.armorHit);
+
         }
       }
     }
@@ -957,11 +964,23 @@ function App() {
       setShotAnim(game.lastShot);
       setTimeout(function () {
         return setShotAnim(null);
-      }, 600);
+      }, game.lastShot.armor ? 3000 : 600);
     }
   }, [JSON.stringify(game === null || game === void 0 || (_game$players = game.players) === null || _game$players === void 0 ? void 0 : _game$players.map(function (p) {
     return p.alive;
   })), game === null || game === void 0 ? void 0 : game.lastShot, JSON.stringify(game === null || game === void 0 ? void 0 : game.armorHit)]);
+  // Watch game.armorHitSeq via useEffect with stable comparison
+  var prevNoShootSeqRef = useRef(0);
+  useEffect(function () {
+    if (!game) return;
+    var seq = game.armorHitSeq || 0;
+    if (seq <= prevNoShootSeqRef.current) return;
+    if (!game.armorHit || !game.armorHit.noShoot) return;
+    prevNoShootSeqRef.current = seq;
+    setShowNoShoot(true);
+    var t = setTimeout(function () { setShowNoShoot(false); }, 3000);
+    return function () { clearTimeout(t); };
+  });
   var startGame = function startGame(size, types) {
     var g = buildGame(size, types);
     prevAliveRef.current = g.players.map(function (p) {
@@ -1559,7 +1578,24 @@ function App() {
         r: "3",
         fill: "#ff2222",
         opacity: "0.9"
-      })), isInRange && !inShotLine && here.length === 0 && /*#__PURE__*/React.createElement("div", {
+      })), shotAnim && shotAnim.hit && shotAnim.to && shotAnim.to.r === r && shotAnim.to.c === c && /*#__PURE__*/React.createElement("div", {
+        style: {
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
+          animation: "armorHitFlash 3s ease-out forwards",
+          zIndex: 10
+        }
+      }, /*#__PURE__*/React.createElement("style", null, "@keyframes armorHitFlash{0%{opacity:0;transform:scale(0.5)}20%{opacity:1;transform:scale(1.3)}60%{opacity:0.8;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: cellSize * 0.7,
+          lineHeight: 1,
+          filter: "drop-shadow(0 0 6px #ff8800)"
+        }
+      }, "\uD83D\uDCA5")), isInRange && !inShotLine && here.length === 0 && /*#__PURE__*/React.createElement("div", {
         style: {
           position: "absolute",
           inset: 0,
@@ -1903,7 +1939,8 @@ function App() {
       }
     }, line);
   }())), /*#__PURE__*/React.createElement(NoShootPopup, {
-    armorHit: armorHit
+    armorHit: armorHit,
+    showNoShoot: showNoShoot
   })));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));</script></body></html>
