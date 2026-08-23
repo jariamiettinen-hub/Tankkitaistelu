@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="180" height="180">
+  <rect width="1024" height="1024" rx="220" fill="#f5f0e8"/>
+  <!-- Tank body -->
+  <rect x="160" y="480" width="700" height="220" rx="60" fill="#6b7140"/>
+  <!-- Tank turret base -->
+  <rect x="280" y="310" width="280" height="120" rx="20" fill="#6b7140"/>
+  <!-- Tank turret top -->
+  <rect x="330" y="230" width="180" height="100" rx="15" fill="#6b7140"/>
+  <!-- Gun barrel -->
+  <rect x="540" y="300" width="290" height="52" rx="12" fill="#6b7140"/>
+  <!-- Gun muzzle -->
+  <rect x="800" y="308" width="60" height="36" rx="8" fill="#6b7140"/>
+  <!-- Track highlight line -->
+  <rect x="170" y="545" width="680" height="22" rx="8" fill="#f5f0e8" opacity="0.35"/>
+  <!-- Wheels -->
+  <circle cx="240" cy="635" r="72" fill="#6b7140"/>
+  <circle cx="240" cy="635" r="42" fill="#f5f0e8"/>
+  <circle cx="410" cy="635" r="72" fill="#6b7140"/>
+  <circle cx="410" cy="635" r="42" fill="#f5f0e8"/>
+  <circle cx="580" cy="635" r="72" fill="#6b7140"/>
+  <circle cx="580" cy="635" r="42" fill="#f5f0e8"/>
+  <circle cx="750" cy="635" r="72" fill="#6b7140"/>
+  <circle cx="750" cy="635" r="42" fill="#f5f0e8"/>
+</svg>

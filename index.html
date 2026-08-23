@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="fi"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tankkitaistelu</title><script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#1a2e1a}</style></head><body><div id="root"></div><script>var React=window.React,ReactDOM=window.ReactDOM;var useState=React.useState,useEffect=React.useEffect,useCallback=React.useCallback,useRef=React.useRef;function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+<!DOCTYPE html>
+<!-- saved from url=(0052)file:///C:/Users/jaria/Downloads/tankkitaistelu.html -->
+<html lang="fi"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Tankkitaistelu"><link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIj4KICA8cmVjdCB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiByeD0iMjIwIiBmaWxsPSIjZjVmMGU4Ii8+CiAgPCEtLSBUYW5rIGJvZHkgLS0+CiAgPHJlY3QgeD0iMTYwIiB5PSI0ODAiIHdpZHRoPSI3MDAiIGhlaWdodD0iMjIwIiByeD0iNjAiIGZpbGw9IiM2YjcxNDAiLz4KICA8IS0tIFRhbmsgdHVycmV0IGJhc2UgLS0+CiAgPHJlY3QgeD0iMjgwIiB5PSIzMTAiIHdpZHRoPSIyODAiIGhlaWdodD0iMTIwIiByeD0iMjAiIGZpbGw9IiM2YjcxNDAiLz4KICA8IS0tIFRhbmsgdHVycmV0IHRvcCAtLT4KICA8cmVjdCB4PSIzMzAiIHk9IjIzMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNSIgZmlsbD0iIzZiNzE0MCIvPgogIDwhLS0gR3VuIGJhcnJlbCAtLT4KICA8cmVjdCB4PSI1NDAiIHk9IjMwMCIgd2lkdGg9IjI5MCIgaGVpZ2h0PSI1MiIgcng9IjEyIiBmaWxsPSIjNmI3MTQwIi8+CiAgPCEtLSBHdW4gbXV6emxlIC0tPgogIDxyZWN0IHg9IjgwMCIgeT0iMzA4IiB3aWR0aD0iNjAiIGhlaWdodD0iMzYiIHJ4PSI4IiBmaWxsPSIjNmI3MTQwIi8+CiAgPCEtLSBUcmFjayBoaWdobGlnaHQgbGluZSAtLT4KICA8cmVjdCB4PSIxNzAiIHk9IjU0NSIgd2lkdGg9IjY4MCIgaGVpZ2h0PSIyMiIgcng9IjgiIGZpbGw9IiNmNWYwZTgiIG9wYWNpdHk9IjAuMzUiLz4KICA8IS0tIFdoZWVscyAtLT4KICA8Y2lyY2xlIGN4PSIyNDAiIGN5PSI2MzUiIHI9IjcyIiBmaWxsPSIjNmI3MTQwIi8+CiAgPGNpcmNsZSBjeD0iMjQwIiBjeT0iNjM1IiByPSI0MiIgZmlsbD0iI2Y1ZjBlOCIvPgogIDxjaXJjbGUgY3g9IjQxMCIgY3k9IjYzNSIgcj0iNzIiIGZpbGw9IiM2YjcxNDAiLz4KICA8Y2lyY2xlIGN4PSI0MTAiIGN5PSI2MzUiIHI9IjQyIiBmaWxsPSIjZjVmMGU4Ii8+CiAgPGNpcmNsZSBjeD0iNTgwIiBjeT0iNjM1IiByPSI3MiIgZmlsbD0iIzZiNzE0MCIvPgogIDxjaXJjbGUgY3g9IjU4MCIgY3k9IjYzNSIgcj0iNDIiIGZpbGw9IiNmNWYwZTgiLz4KICA8Y2lyY2xlIGN4PSI3NTAiIGN5PSI2MzUiIHI9IjcyIiBmaWxsPSIjNmI3MTQwIi8+CiAgPGNpcmNsZSBjeD0iNzUwIiBjeT0iNjM1IiByPSI0MiIgZmlsbD0iI2Y1ZjBlOCIvPgo8L3N2Zz4="><title>Tankkitaistelu</title><script src="./index_files/react.production.min.js.lataus" crossorigin="anonymous"></script><script src="./index_files/react-dom.production.min.js.lataus" crossorigin="anonymous"></script><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#1a2e1a}</style></head><body><div id="root"><div style="font-family: sans-serif; background: rgb(26, 46, 26); min-height: 100vh; color: rgb(232, 232, 232); padding: 20px; display: flex; flex-direction: column; align-items: center;"><div style="font-size: 26px; font-weight: 800; color: rgb(200, 232, 160); margin-bottom: 4px;">🎖️ Tankki­taistelu</div><div style="font-size: 13px; color: rgb(216, 232, 208); margin-bottom: 6px;">Tuhoa viholliset — väistä miinat</div><div style="font-size: 11px; color: rgb(170, 187, 170); margin-bottom: 22px; text-align: center;">Siirrä tankkia ja ammu, jos vihollinen on kantamalla.<br>Ammuksen kantamaan vaikuttaa maasto.</div><div style="width: 100%; max-width: 340px;"><div style="font-size: 11px; color: rgb(205, 220, 204); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;">Pelaajat</div><div style="display: flex; align-items: center; gap: 12px; background: rgb(36, 56, 36); border: 1.5px solid rgb(26, 122, 38); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; opacity: 1; transition: 0.15s;"><svg width="32.68" height="32.68" viewBox="0 0 24 24" style="display: block; opacity: 1;"><rect x="4" y="6" width="16" height="12" rx="3" fill="#2ecc40" stroke="#1a7a26" stroke-width="1.2"></rect><rect x="1" y="5" width="4" height="14" rx="2" fill="#1a7a26" opacity="0.85"></rect><rect x="19" y="5" width="4" height="14" rx="2" fill="#1a7a26" opacity="0.85"></rect><ellipse cx="12" cy="12" rx="4.5" ry="4" fill="#2ecc40" stroke="#1a7a26" stroke-width="1"></ellipse><rect x="12" y="3" width="2.5" height="7" rx="1" fill="#1a7a26"></rect><circle cx="12" cy="12" r="1.5" fill="#1a7a26" opacity="0.6"></circle></svg><div style="flex: 1 1 0%;"><div style="font-weight: 700; color: rgb(46, 204, 64); font-size: 14px;">Pelaaja 1</div><div style="font-size: 11px; color: rgb(205, 220, 204);">👤 Ihminen</div></div><div style="font-size: 11px; color: rgb(170, 187, 170); border: 1px solid rgb(106, 138, 106); border-radius: 6px; padding: 3px 8px;">vaihda</div></div><div style="display: flex; align-items: center; gap: 12px; background: rgb(36, 56, 36); border: 1.5px solid rgb(138, 26, 16); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; opacity: 1; transition: 0.15s;"><svg width="32.68" height="32.68" viewBox="0 0 24 24" style="display: block; opacity: 1;"><rect x="4" y="6" width="16" height="12" rx="3" fill="#e74c3c" stroke="#8a1a10" stroke-width="1.2"></rect><rect x="1" y="5" width="4" height="14" rx="2" fill="#8a1a10" opacity="0.85"></rect><rect x="19" y="5" width="4" height="14" rx="2" fill="#8a1a10" opacity="0.85"></rect><ellipse cx="12" cy="12" rx="4.5" ry="4" fill="#e74c3c" stroke="#8a1a10" stroke-width="1"></ellipse><rect x="12" y="3" width="2.5" height="7" rx="1" fill="#8a1a10"></rect><circle cx="12" cy="12" r="1.5" fill="#8a1a10" opacity="0.6"></circle></svg><div style="flex: 1 1 0%;"><div style="font-weight: 700; color: rgb(231, 76, 60); font-size: 14px;">Pelaaja 2</div><div style="font-size: 11px; color: rgb(205, 220, 204);">🤖 Tietokone</div></div><div style="font-size: 11px; color: rgb(170, 187, 170); border: 1px solid rgb(106, 138, 106); border-radius: 6px; padding: 3px 8px;">vaihda</div></div><div style="display: flex; align-items: center; gap: 12px; background: rgb(36, 56, 36); border: 1.5px solid rgb(26, 90, 138); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; opacity: 1; transition: 0.15s;"><svg width="32.68" height="32.68" viewBox="0 0 24 24" style="display: block; opacity: 1;"><rect x="4" y="6" width="16" height="12" rx="3" fill="#3498db" stroke="#1a5a8a" stroke-width="1.2"></rect><rect x="1" y="5" width="4" height="14" rx="2" fill="#1a5a8a" opacity="0.85"></rect><rect x="19" y="5" width="4" height="14" rx="2" fill="#1a5a8a" opacity="0.85"></rect><ellipse cx="12" cy="12" rx="4.5" ry="4" fill="#3498db" stroke="#1a5a8a" stroke-width="1"></ellipse><rect x="12" y="3" width="2.5" height="7" rx="1" fill="#1a5a8a"></rect><circle cx="12" cy="12" r="1.5" fill="#1a5a8a" opacity="0.6"></circle></svg><div style="flex: 1 1 0%;"><div style="font-weight: 700; color: rgb(52, 152, 219); font-size: 14px;">Pelaaja 3</div><div style="font-size: 11px; color: rgb(205, 220, 204);">🤖 Tietokone</div></div><div style="font-size: 11px; color: rgb(170, 187, 170); border: 1px solid rgb(106, 138, 106); border-radius: 6px; padding: 3px 8px;">vaihda</div></div><div style="display: flex; align-items: center; gap: 12px; background: rgb(36, 56, 36); border: 1.5px solid rgb(138, 90, 0); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; opacity: 1; transition: 0.15s;"><svg width="32.68" height="32.68" viewBox="0 0 24 24" style="display: block; opacity: 1;"><rect x="4" y="6" width="16" height="12" rx="3" fill="#f39c12" stroke="#8a5a00" stroke-width="1.2"></rect><rect x="1" y="5" width="4" height="14" rx="2" fill="#8a5a00" opacity="0.85"></rect><rect x="19" y="5" width="4" height="14" rx="2" fill="#8a5a00" opacity="0.85"></rect><ellipse cx="12" cy="12" rx="4.5" ry="4" fill="#f39c12" stroke="#8a5a00" stroke-width="1"></ellipse><rect x="12" y="3" width="2.5" height="7" rx="1" fill="#8a5a00"></rect><circle cx="12" cy="12" r="1.5" fill="#8a5a00" opacity="0.6"></circle></svg><div style="flex: 1 1 0%;"><div style="font-weight: 700; color: rgb(243, 156, 18); font-size: 14px;">Pelaaja 4</div><div style="font-size: 11px; color: rgb(205, 220, 204);">🤖 Tietokone</div></div><div style="font-size: 11px; color: rgb(170, 187, 170); border: 1px solid rgb(106, 138, 106); border-radius: 6px; padding: 3px 8px;">vaihda</div></div><div style="font-size: 11px; color: rgb(205, 220, 204); text-transform: uppercase; letter-spacing: 0.08em; margin: 16px 0px 10px;">Kentän koko</div><div style="display: flex; gap: 8px;"><button style="flex: 1 1 0%; padding: 10px 0px; font-size: 14px; font-weight: 700; border-radius: 8px; border: 1.5px solid rgb(58, 74, 58); background: rgb(36, 56, 36); color: rgb(205, 220, 204); cursor: pointer;">10×10</button><button style="flex: 1 1 0%; padding: 10px 0px; font-size: 14px; font-weight: 700; border-radius: 8px; border: 1.5px solid rgb(58, 74, 58); background: rgb(36, 56, 36); color: rgb(205, 220, 204); cursor: pointer;">12×12</button><button style="flex: 1 1 0%; padding: 10px 0px; font-size: 14px; font-weight: 700; border-radius: 8px; border: 1.5px solid rgb(90, 154, 58); background: rgb(58, 106, 42); color: rgb(200, 232, 160); cursor: pointer;">13×13</button><button style="flex: 1 1 0%; padding: 10px 0px; font-size: 14px; font-weight: 700; border-radius: 8px; border: 1.5px solid rgb(58, 74, 58); background: rgb(36, 56, 36); color: rgb(205, 220, 204); cursor: pointer;">14×14</button></div><button style="width: 100%; margin-top: 24px; padding: 14px 0px; font-size: 16px; font-weight: 800; border-radius: 12px; border: 2px solid rgb(90, 154, 58); background: rgb(58, 106, 42); color: rgb(200, 232, 160); cursor: pointer;">🚀 Aloita taistelu (4 pelaajaa)</button></div></div></div><script>var React=window.React,ReactDOM=window.ReactDOM;var useState=React.useState,useEffect=React.useEffect,useCallback=React.useCallback,useRef=React.useRef;function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
@@ -833,8 +835,18 @@ function SetupScreen(_ref3) {
 var NUM_COLORS = ["", "#fff9a0", "#b8ffb8", "#ffb8b8", "#ff7070", "#ff3030", "#ff0000", "#aa0000", "#660000"];
 function NoShootPopup(_ref) {
   var armorHit = _ref.armorHit;
-  var showNoShoot = _ref.showNoShoot;
-  if (!showNoShoot || !armorHit) return null;
+  var onDone = _ref.onDone;
+  var seqRef = useRef(null);
+  useEffect(function () {
+    if (armorHit && armorHit.noShoot && armorHit.seq !== seqRef.current) {
+      seqRef.current = armorHit.seq;
+      var t = setTimeout(function () {
+        onDone();
+      }, 3000);
+      return function () { clearTimeout(t); };
+    }
+  }, [armorHit && armorHit.seq]);
+  if (!armorHit || !armorHit.noShoot) return null;
   var pd = PLAYER_DEF[armorHit.id];
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -885,10 +897,7 @@ function App() {
     _useState10 = _slicedToArray(_useState1, 2),
     armorHit = _useState10[0],
     setArmorHit = _useState10[1];
-  var _useStateNS = useState(false),
-    _useStateNS2 = _slicedToArray(_useStateNS, 2),
-    showNoShoot = _useStateNS2[0],
-    setShowNoShoot = _useStateNS2[1];
+
   var eventQueueRef = useRef([]);
   var processingRef = useRef(false);
   var _processQueue = function processQueue() {
@@ -969,18 +978,13 @@ function App() {
   }, [JSON.stringify(game === null || game === void 0 || (_game$players = game.players) === null || _game$players === void 0 ? void 0 : _game$players.map(function (p) {
     return p.alive;
   })), game === null || game === void 0 ? void 0 : game.lastShot, JSON.stringify(game === null || game === void 0 ? void 0 : game.armorHit)]);
-  // Watch game.armorHitSeq via useEffect with stable comparison
-  var prevNoShootSeqRef = useRef(0);
-  useEffect(function () {
-    if (!game) return;
-    var seq = game.armorHitSeq || 0;
-    if (seq <= prevNoShootSeqRef.current) return;
-    if (!game.armorHit || !game.armorHit.noShoot) return;
-    prevNoShootSeqRef.current = seq;
-    setShowNoShoot(true);
-    var t = setTimeout(function () { setShowNoShoot(false); }, 3000);
-    return function () { clearTimeout(t); };
-  });
+
+  var clearNoShoot = useCallback(function () {
+    setGame(function (g) {
+      if (!g || !g.armorHit) return g;
+      return _objectSpread(_objectSpread({}, g), {}, { armorHit: _objectSpread(_objectSpread({}, g.armorHit), {}, { noShoot: false }) });
+    });
+  }, []);
   var startGame = function startGame(size, types) {
     var g = buildGame(size, types);
     prevAliveRef.current = g.players.map(function (p) {
@@ -1939,8 +1943,8 @@ function App() {
       }
     }, line);
   }())), /*#__PURE__*/React.createElement(NoShootPopup, {
-    armorHit: armorHit,
-    showNoShoot: showNoShoot
+    armorHit: game.armorHit,
+    onDone: clearNoShoot
   })));
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));</script></body></html>
